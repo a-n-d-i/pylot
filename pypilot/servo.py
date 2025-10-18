@@ -13,7 +13,6 @@ import select, serial
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from values import *
-import serialprobe
 
 import fcntl
 # these are not defined in python module
@@ -587,7 +586,8 @@ class Servo(object):
 
     def poll(self):
         if not self.driver:
-            device_path = serialprobe.probe('servo', [38400], 5)
+            # TODO: move to config file
+            device_path = ("/dev/ttyS0", 38400)
             if device_path:
                 print('servo probe', device_path, time.monotonic())
                 try:
@@ -632,7 +632,6 @@ class Servo(object):
             if self.controller.value == 'none':
                 device_path = [self.device.port, self.device.baudrate]
                 print('arduino servo ' + _('found'), device_path)
-                serialprobe.success('servo', device_path)
                 self.controller.set('arduino')
                 self.driver.disengage()
 

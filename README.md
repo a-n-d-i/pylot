@@ -1,3 +1,6 @@
+# Intro
+This is a fork of pypilot. Don't use it, it's just me playing around. 
+
 # PyPilot - Open Source Marine Autopilot
 
 ## Installation
