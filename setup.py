@@ -47,40 +47,6 @@ arduino_servo_module = Extension('pypilot/arduino_servo/_arduino_servo',
                         extra_compile_args=['-Wno-unused-result'],
                         swig_opts=['-c++']
 )
-
-ugfx_defs = ['-DWIRINGPI']
-try:
-    import RPi.GPIO
-    ugfx_libraries=['wiringPi']
-except:
-    try:
-        import OPi.GPIO
-        ugfx_libraries=['wiringPi']
-    except:
-        print('no RPi.GPIO library for ugfx')
-        ugfx_libraries=[]
-        ugfx_defs = []
-
-ugfx_module = Extension('pypilot/hat/ugfx/_ugfx',
-                        sources=['hat/ugfx/ugfx.cpp',
-                                 'hat/ugfx/ugfx.i'],
-                        extra_compile_args=['-Wno-unused-result'] + ugfx_defs,
-                        libraries=ugfx_libraries,
-                        swig_opts=['-c++'] + ugfx_defs)
-
-if ugfx_libraries:
-    spireader_module = Extension('pypilot/hat/spireader/_spireader',
-                        sources=['hat/spireader/spireader.cpp',
-                                 'hat/spireader/spireader.i'],
-                        extra_compile_args=['-Wno-unused-result'],
-                        libraries=ugfx_libraries,
-                        swig_opts=['-c++'])
-
-else:
-    spireader_module = None
-
-os.system('cd hat/locale;./translate.sh')
-os.system('cd hat; pybabel compile -d translations')
 os.system('cd pypilot/locale;./translate.sh')
 os.system('cd web; pybabel compile -d translations')
 
@@ -97,7 +63,7 @@ def find_locales(name, dir = 'locale'):
 
 from pypilot import version
 
-packages = ['pypilot', 'pypilot/pilots', 'pypilot/arduino_servo', 'ui', 'hat', 'web', 'pypilot/linebuffer', 'hat/ugfx', 'hat/spireader']
+packages = ['pypilot', 'pypilot/pilots', 'pypilot/arduino_servo', 'web', 'pypilot/linebuffer']
 try:
     from setuptools import find_packages
     packages = find_packages()
@@ -113,15 +79,11 @@ for package in list(packages):
         packages.append('pypilot.'+package)
         package_dirs['pypilot.'+package] = package.replace('.', '/')
 
-package_data = {'pypilot': find_locales('pypilot'),
-                'pypilot.hat': ['font.ttf', 'static/*', 'templates/*'] + find_locales('hat')  + find_locales('hat', 'translations'),
-                'pypilot.ui': ['*.png', '*.mtl', '*.obj'],
+package_data = {'pypilot': find_locales('pypilot'),                
                 'pypilot.web': ['static/*', 'templates/*'] + ['pypilot_web.pot'] + find_locales('web', 'translations')}
         
 
-ext_modules = [arduino_servo_module, linebuffer_module, ugfx_module]
-if spireader_module:
-    ext_modules.append(spireader_module)    
+ext_modules = [arduino_servo_module, linebuffer_module]
 
     
 setup (name = 'pypilot',
@@ -140,13 +102,8 @@ setup (name = 'pypilot',
                'pypilot=pypilot.autopilot:main',
                'pypilot_boatimu=pypilot.boatimu:main',
                'pypilot_servo=pypilot.servo:main',
-               'pypilot_web=pypilot.web.web:main',
-               'pypilot_hat=pypilot.hat.hat:main',
-               'pypilot_control=pypilot.ui.autopilot_control:main',
-               'pypilot_calibration=pypilot.ui.autopilot_calibration:main',
                'pypilot_client=pypilot.client:main',
-               'pypilot_scope=pypilot.ui.scope_wx:main',
-               'pypilot_client_wx=pypilot.ui.client_wx:main'
-               ]
+               'pypilot_web=pypilot.web.web:main'
+           ]
         }
        )
